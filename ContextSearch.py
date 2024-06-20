@@ -10,7 +10,7 @@ import struct
 import os
 import logging
 
-__version__ = "2.19"
+__version__ = "2.20"
 
 BINARY_URL = "https://raw.githubusercontent.com/ssborbis/ContextSearch-Native-App/master/ContextSearch.py"
 VERSION_URL = "https://raw.githubusercontent.com/ssborbis/ContextSearch-Native-App/master/version.json"
@@ -124,6 +124,8 @@ try:
 
         import subprocess
 
+        message["path"] = message["path"].replace("$", "\$")
+
         cwd = message.get("cwd") or os.getcwd()
         cwd = os.path.expanduser(cwd)
 
@@ -142,10 +144,12 @@ try:
                 CREATE_NEW_CONSOLE = 0x00000010
                 CREATE_BREAKAWAY_FROM_JOB = 0x01000000
 
-                subprocess.run(message["path"], cwd=cwd, shell=True, creationflags=CREATE_BREAKAWAY_FROM_JOB )
+                subprocess.run(message["path"], cwd=cwd, shell=True, creationflags=CREATE_BREAKAWAY_FROM_JOB, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL )
 
             else:
-                subprocess.run(message["path"], cwd=cwd, shell=True)
+                subprocess.run(message["path"], cwd=cwd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+            send_message(encode_message(True))
         
         sys.exit(0)
 
